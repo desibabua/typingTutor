@@ -1,8 +1,14 @@
 let { stdin, stdout } = process;
 stdin = stdin.setEncoding("utf8");
-let words = require("./words.json");
-let initialchar = "abcdefghijklmnopqrstuvwxyzx".split("");
+let initialchar = "abcdefghijklmnopqrstuvwxyzxABCDEFGHIJKLMNOPQRSTUVWXYZ".split(
+  ""
+);
 const chalk = require("chalk");
+const counter = {
+  correct: 0,
+  totalChar: 0,
+  timer: new Date().valueOf()
+};
 
 const { blue, yellowBright, green, white, red } = chalk;
 
@@ -17,7 +23,7 @@ const newCharMaker = function() {
   charcterInfo.char = initialchar[selectedColumn];
   charcterInfo.x = Math.floor(Math.random() * columns);
   charcterInfo.y = 2;
-  charcterInfo.color = colors[Math.floor(Math.random()*5)]
+  charcterInfo.color = colors[Math.floor(Math.random() * 5)];
   return charcterInfo;
 };
 
@@ -35,10 +41,23 @@ const printChars = function() {
   });
 };
 
+const gameQuiter = function() {
+  stdout.cursorTo(0,1)
+  stdout.write(`SCORE :---> ${(counter.correct)*5}\n\n`)
+  stdout.write(`total correct answer : ${counter.correct}\n`);
+  stdout.write(`total wrong answer : ${counter.totalChar- counter.correct}\n`)
+  stdout.write(
+    `total time played : ${Math.floor(
+      (new Date().valueOf() - counter.timer) / 1000
+    )} seconds\n`
+  );
+  process.exit(0);
+};
+
 const isGameOver = function(rows) {
   characters.forEach(charInfo => {
-    if (charInfo.y == rows) {
-      process.exit(0);
+    if (charInfo.y == rows || (counter.totalChar- counter.correct == 10)) {
+      gameQuiter();
     }
   });
 };
@@ -47,6 +66,16 @@ const envSetUp = function() {
   let rows = stdout.rows;
   printChars();
   isGameOver(rows);
+  stdout.cursorTo(100, 35);
+  stdout.write(
+    `time : ${Math.floor(
+      (new Date().valueOf() - counter.timer) / 1000
+    )} seconds`
+  );
+  stdout.cursorTo(80, 35);
+  stdout.write(`correctAns : ${counter.correct}`);
+  stdout.cursorTo(60, 35);
+  stdout.write(`wrongAns : ${counter.totalChar - counter.correct} /10`);
   stdout.cursorTo(0, 35);
 };
 
@@ -55,6 +84,7 @@ const wordsMaker = function() {
     stdin.setRawMode("true");
   }
   if (process.argv[2] == "--w") {
+    let words = require("./words.json");
     initialchar = initialchar.concat(words);
     initialchar = initialchar.map(element => element + "\n");
   }
@@ -68,8 +98,13 @@ const main = function() {
     characters.forEach(charinfo => {
       if (inputChar == charinfo.char) {
         characters.splice(characters.indexOf(charinfo), 1);
+        counter.correct += 1;
+      }
+      if (inputChar == "?") {
+        gameQuiter();
       }
     });
+    counter.totalChar += 1;
   });
 };
 
