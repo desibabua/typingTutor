@@ -1,0 +1,23 @@
+{
+  "name": "typing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "typingPractice.js",
+  "dependencies": {
+    "chalk": "^3.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/desibabua/typingTutor.git"
+  },
+  "author": "ayush",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/desibabua/typingTutor/issues"
+  },
+  "homepage": "https://github.com/desibabua/typingTutor#readme"
+}

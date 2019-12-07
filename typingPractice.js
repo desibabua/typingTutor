@@ -19,8 +19,8 @@ const newCharMaker = function() {
   let charcterInfo = {};
   let columns = process.stdout.columns - 5;
   let multiplier = initialchar.length;
-  const selectedColumn = Math.floor(Math.random() * multiplier);
-  charcterInfo.char = initialchar[selectedColumn];
+  const selectedCharIndex = Math.floor(Math.random() * multiplier);
+  charcterInfo.char = initialchar[selectedCharIndex];
   charcterInfo.x = Math.floor(Math.random() * columns);
   charcterInfo.y = 2;
   charcterInfo.color = colors[Math.floor(Math.random() * 5)];
@@ -42,10 +42,10 @@ const printChars = function() {
 };
 
 const gameQuiter = function() {
-  stdout.cursorTo(0,1)
-  stdout.write(`SCORE :---> ${(counter.correct)*5}\n\n`)
+  stdout.cursorTo(0, 1);
+  stdout.write(`SCORE :---> ${counter.correct * 5}\n\n`);
   stdout.write(`total correct answer : ${counter.correct}\n`);
-  stdout.write(`total wrong answer : ${counter.totalChar- counter.correct}\n`)
+  stdout.write(`total wrong answer : ${counter.totalChar - counter.correct}\n`);
   stdout.write(
     `total time played : ${Math.floor(
       (new Date().valueOf() - counter.timer) / 1000
@@ -56,7 +56,7 @@ const gameQuiter = function() {
 
 const isGameOver = function(rows) {
   characters.forEach(charInfo => {
-    if (charInfo.y == rows || (counter.totalChar- counter.correct == 10)) {
+    if (charInfo.y == rows || counter.totalChar - counter.correct >= 10) {
       gameQuiter();
     }
   });
@@ -100,7 +100,7 @@ const main = function() {
         characters.splice(characters.indexOf(charinfo), 1);
         counter.correct += 1;
       }
-      if (inputChar == "?") {
+      if (inputChar == "?" || inputChar == "?\n") {
         gameQuiter();
       }
     });
