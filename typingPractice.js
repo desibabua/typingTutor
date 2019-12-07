@@ -6,7 +6,7 @@ let initialchar = "abcdefghijklmnopqrstuvwxyzxABCDEFGHIJKLMNOPQRSTUVWXYZ".split(
 const chalk = require("chalk");
 const counter = {
   correct: 0,
-  totalChar: 0,
+  totalCharTyped: 0,
   timer: new Date().valueOf()
 };
 
@@ -45,7 +45,9 @@ const gameQuiter = function() {
   stdout.cursorTo(0, 1);
   stdout.write(`SCORE :---> ${counter.correct * 5}\n\n`);
   stdout.write(`total correct answer : ${counter.correct}\n`);
-  stdout.write(`total wrong answer : ${counter.totalChar - counter.correct}\n`);
+  stdout.write(
+    `total wrong answer : ${counter.totalCharTyped - counter.correct}\n`
+  );
   stdout.write(
     `total time played : ${Math.floor(
       (new Date().valueOf() - counter.timer) / 1000
@@ -56,7 +58,7 @@ const gameQuiter = function() {
 
 const isGameOver = function(rows) {
   characters.forEach(charInfo => {
-    if (charInfo.y == rows || counter.totalChar - counter.correct >= 10) {
+    if (charInfo.y == rows || counter.totalCharTyped - counter.correct >= 10) {
       gameQuiter();
     }
   });
@@ -75,7 +77,7 @@ const envSetUp = function() {
   stdout.cursorTo(80, 35);
   stdout.write(`correctAns : ${counter.correct}`);
   stdout.cursorTo(60, 35);
-  stdout.write(`wrongAns : ${counter.totalChar - counter.correct} /10`);
+  stdout.write(`wrongAns : ${counter.totalCharTyped - counter.correct} /10`);
   stdout.cursorTo(0, 35);
 };
 
@@ -90,21 +92,27 @@ const wordsMaker = function() {
   }
 };
 
+const eraseWordOrChar = function(inputChar) {
+  return (editor = function(charinfo) {
+    if (inputChar == charinfo.char) {
+      characters.splice(characters.indexOf(charinfo), 1);
+      counter.correct += 1;
+    }
+    return inputChar == charinfo.char;
+  });
+};
+
 const main = function() {
   wordsMaker();
   setInterval(envSetUp, 500);
   setInterval(characterInserter, 1000);
   stdin.on("data", inputChar => {
-    characters.forEach(charinfo => {
-      if (inputChar == charinfo.char) {
-        characters.splice(characters.indexOf(charinfo), 1);
-        counter.correct += 1;
-      }
-      if (inputChar == "?" || inputChar == "?\n") {
-        gameQuiter();
-      }
-    });
-    counter.totalChar += 1;
+    eraseWordOrChar(inputChar);
+    characters.some(editor);
+    counter.totalCharTyped += 1;
+    if (inputChar == "?" || inputChar == "?\n") {
+      gameQuiter();
+    }
   });
 };
 
