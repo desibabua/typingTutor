@@ -2,7 +2,8 @@
 
 ## How to install
 ```
-
+git clone https://github.com/desibabua/typingTutor.git
+npm install
 ```
 
 ## Command to run
