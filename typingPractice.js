@@ -1,19 +1,19 @@
 let { stdin, stdout } = process;
 stdin = stdin.setEncoding("utf8");
+const chalk = require("chalk");
+const rl = require("readline-sync");
+const { blue, yellowBright, green, white, red } = chalk;
+let colors = [blue, yellowBright, green, white, red];
+let characters = [];
 let initialchar = "abcdefghijklmnopqrstuvwxyzxABCDEFGHIJKLMNOPQRSTUVWXYZ".split(
   ""
 );
-const chalk = require("chalk");
+
 const counter = {
   correct: 0,
   totalCharTyped: 0,
   timer: new Date().valueOf()
 };
-
-const { blue, yellowBright, green, white, red } = chalk;
-
-let colors = [blue, yellowBright, green, white, red];
-let characters = [];
 
 const newCharMaker = function() {
   let charcterInfo = {};
@@ -87,33 +87,41 @@ const wordsMaker = function() {
   }
   if (process.argv[2] == "--w") {
     let words = require("./words.json");
-    initialchar = initialchar.concat(words);
-    initialchar = initialchar.map(element => element + "\n");
+    initialchar = words.map(element => element + "\n");
   }
 };
 
 const eraseWordOrChar = function(inputChar) {
-  return (editor = function(charinfo) {
+  return function(charinfo) {
     if (inputChar == charinfo.char) {
       characters.splice(characters.indexOf(charinfo), 1);
       counter.correct += 1;
     }
     return inputChar == charinfo.char;
-  });
+  };
+};
+
+const typingGame = inputChar => {
+  editor = eraseWordOrChar(inputChar);
+  characters.some(editor);
+  counter.totalCharTyped += 1;
+  if (inputChar.trim() == "?") {
+    gameQuiter();
+  }
+};
+
+const printInstruction = function() {
+  const instruction = `Press ? to quit the game\nPress Enter: to Start the game\n`;
+  rl.question(instruction);
 };
 
 const main = function() {
   wordsMaker();
+  printInstruction();
+  stdin.resume();
   setInterval(envSetUp, 500);
   setInterval(characterInserter, 1000);
-  stdin.on("data", inputChar => {
-    eraseWordOrChar(inputChar);
-    characters.some(editor);
-    counter.totalCharTyped += 1;
-    if (inputChar == "?" || inputChar == "?\n") {
-      gameQuiter();
-    }
-  });
+  stdin.on("data", typingGame);
 };
 
 main();
